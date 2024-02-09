@@ -1,6 +1,6 @@
 # Red Hat certified operators production catalog
 Production catalog for Red Hat Certified Operator Bundles
-
+blabla
 # Operator bundle submission
 A new operator bundle submission needs to follow a predefined directory
 structure that is described below in this section. The new submission is
