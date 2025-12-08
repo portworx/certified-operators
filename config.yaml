@@ -12,6 +12,7 @@ tests:
       - ^kubeturbo-certified
       - ^openshiftartifactoryha-operator
       - ^portworx-certified
+      - ^portworx-csi
       - ^prometurbo-certified
       - ^t8c-certified
       - ^vfunction-server-operator
