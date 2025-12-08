@@ -8,7 +8,8 @@ entries:
   schema: olm.package
 - entries:
   - name: portworx-operator.v25.4.0
-    skips: portworx-operator.v25.3.1
+    skips:
+      - portworx-operator.v25.3.1
   - name: portworx-operator.v25.5.0
     replaces: portworx-operator.v25.4.0
   name: alpha
@@ -16,7 +17,8 @@ entries:
   schema: olm.channel
 - entries:
   - name: portworx-operator.v25.4.0
-    skips: portworx-operator.v25.3.1
+    skips:
+      - portworx-operator.v25.3.1
   - name: portworx-operator.v25.5.0
     replaces: portworx-operator.v25.4.0
   name: stable
