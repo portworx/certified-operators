@@ -258,4 +258,6 @@ entries:
   schema: olm.bundle
 - image: registry.connect.redhat.com/portworx/portworx-certified-bundle@sha256:1bd3d2d01b4f024071a6d3e6271ba9fa73428512fb41bc27e01775c07dc5d40e
   schema: olm.bundle
+- image: docker.io/portworx/portworx-certified-bundle:25.5.1
+  schema: olm.bundle
 schema: olm.template.basic
