@@ -88,6 +88,8 @@ entries:
   replaces: portworx-operator.v25.3.1
 - name: portworx-operator.v25.5.0
   replaces: portworx-operator.v25.4.0
+- name: portworx-operator.v25.5.1
+  replaces: portworx-operator.v25.5.0
 name: alpha
 package: portworx-certified
 schema: olm.channel
@@ -174,6 +176,8 @@ entries:
   replaces: portworx-operator.v25.3.1
 - name: portworx-operator.v25.5.0
   replaces: portworx-operator.v25.4.0
+- name: portworx-operator.v25.5.1
+  replaces: portworx-operator.v25.5.0
 name: stable
 package: portworx-certified
 schema: olm.channel
