@@ -1,0 +1,9 @@
+FROM quay.io/operator-framework/opm:latest
+
+# Build context is expected to be the FBC content directory (e.g. catalogs/v4.16/portworx-certified)
+COPY . /configs
+
+EXPOSE 50051
+
+# Run opm serve against the FBC content; let opm manage its own cache directory.
+ENTRYPOINT ["opm", "serve", "/configs", "--port", "50051"]

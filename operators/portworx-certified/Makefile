@@ -86,7 +86,7 @@ ARCH=$(shell uname -m | sed 's/x86_64/amd64/')
 # Automatically download the binaries and scripts and place them in the bin directory
 OPM_VERSION ?= v1.46.0
 ${BINDIR}/opm:
-	if [ ! -d ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
+	if [ ! -d  ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
 	curl -sLO https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm && chmod +x $(OS)-$(ARCH)-opm && mv $(OS)-$(ARCH)-opm ${BINDIR}/opm
 
 YQ_VERSION ?= v4.45.1
@@ -100,3 +100,95 @@ render_catalogs.sh:
 	curl -sLO https://raw.githubusercontent.com/redhat-openshift-ecosystem/operator-pipelines/main/fbc/render_catalogs.sh
 	mv render_catalogs.sh ${BINDIR}/render_catalogs.sh
 	chmod +x ${BINDIR}/render_catalogs.sh
+
+# Optional FBC registry image helper targets.
+# These wrap lower-level FBC make targets that are expected to exist in $(FBC_DIR).
+#
+# Variables expected to be provided by the caller:
+#   - FBC_DIR                : directory that contains the FBC Makefile (defaults to $(TOPDIR))
+#   - OCP_VERSION            : catalog version to build (e.g. v4.18)
+#   - RELEASE_VER            : logical release version (e.g. 25.5.1)
+#   - DOCKER_HUB_REPO        : base Docker Hub repo (e.g. docker.io/portworx)
+#   - DOCKER_HUB_REGISTRY_IMG: full image name:tag for the FBC registry image
+
+FBC_DIR ?= $(TOPDIR)
+
+.PHONY: fbc-build-registry
+fbc-build-registry:
+	@echo "Building FBC registry image..."
+	@$(MAKE) -C $(FBC_DIR) build-fbc-registry OCP_VERSION=$(OCP_VERSION) RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-push-registry
+fbc-push-registry:
+	@echo "Pushing FBC registry image..."
+	@$(MAKE) -C $(FBC_DIR) push-fbc-registry OCP_VERSION=$(OCP_VERSION) RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-registry
+fbc-registry:
+	@echo "Building and pushing FBC registry image..."
+	@$(MAKE) -C $(FBC_DIR) fbc-registry OCP_VERSION=$(OCP_VERSION) RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-build-all-registries
+fbc-build-all-registries:
+	@echo "Building all FBC registry images..."
+	@$(MAKE) -C $(FBC_DIR) build-all-fbc-registries RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-push-all-registries
+fbc-push-all-registries:
+	@echo "Pushing all FBC registry images..."
+	@$(MAKE) -C $(FBC_DIR) push-all-fbc-registries RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-all-registries
+fbc-all-registries:
+	@echo "Building and pushing all FBC registry images..."
+	@$(MAKE) -C $(FBC_DIR) all-fbc-registries RELEASE_VER=$(RELEASE_VER) \
+		DOCKER_HUB_REPO=$(DOCKER_HUB_REPO) FBC_REGISTRY_IMG=$(DOCKER_HUB_REGISTRY_IMG)
+
+.PHONY: fbc-test
+fbc-test:
+	@echo "Building and pushing test registry image for v4.16..."
+	@if [ ! -d "$(FBC_DIR)/catalogs/v4.16/$(OPERATOR_NAME)" ]; then \
+			echo "Catalogs not found, generating them first..."; \
+			$(MAKE) catalogs; \
+		else \
+			echo "Using existing catalogs (run 'make clean' to regenerate)"; \
+		fi
+	@$(MAKE) fbc-registry OCP_VERSION=v4.16 RELEASE_VER=$(RELEASE_VER)
+
+.PHONY: fbc-prod
+fbc-prod:
+	@echo "Building and pushing all registry images for production..."
+	@if [ ! -d "$(FBC_DIR)/catalogs/v4.16/$(OPERATOR_NAME)" ]; then \
+			echo "Catalogs not found, generating them first..."; \
+			$(MAKE) catalogs; \
+		else \
+			echo "Using existing catalogs (run 'make clean' to regenerate)"; \
+		fi
+	@$(MAKE) fbc-all-registries RELEASE_VER=$(RELEASE_VER)
+
+.PHONY: fbc-build-test
+fbc-build-test:
+	@echo "Building test registry image for v4.16 (no push)..."
+	@if [ ! -d "$(FBC_DIR)/catalogs/v4.16/$(OPERATOR_NAME)" ]; then \
+			echo "Catalogs not found, generating them first..."; \
+			$(MAKE) catalogs; \
+		else \
+			echo "Using existing catalogs (run 'make clean' to regenerate)"; \
+		fi
+	@$(MAKE) fbc-build-registry OCP_VERSION=v4.16 RELEASE_VER=$(RELEASE_VER)
+
+.PHONY: fbc-build-prod
+fbc-build-prod:
+	@echo "Building all registry images for production (no push)..."
+	@if [ ! -d "$(FBC_DIR)/catalogs/v4.16/$(OPERATOR_NAME)" ]; then \
+			echo "Catalogs not found, generating them first..."; \
+			$(MAKE) catalogs; \
+		else \
+			echo "Using existing catalogs (run 'make clean' to regenerate)"; \
+		fi
+	@$(MAKE) fbc-build-all-registries RELEASE_VER=$(RELEASE_VER)
