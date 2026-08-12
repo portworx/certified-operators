@@ -1,4 +1,3 @@
----
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -8,7 +7,7 @@ metadata:
     capabilities: Auto Pilot
     categories: "Storage"
     description: Cloud native storage solution for production workloads
-    containerImage: docker.io/portworx/px-operator:26.3.1-dev
+    containerImage: docker.io/portworx/px-operator@sha256:bba082318551a1fe51e690dc723f3c45be9ad50cd53a0bc183b47a5dda9bc4b5
     createdAt: 2026-07-28T05:48:06Z
     support: Portworx, Inc
     certified: "true"
@@ -77,8 +76,10 @@ spec:
     name: Portworx by Everpure
   keywords: ["portworx", "persistent storage", "storage", "cloud native", "open source"]
   relatedImages:
-    - name: portworx-operator
-      image: docker.io/portworx/px-operator:26.3.1-dev
+  - name: portworx-operator
+    image: docker.io/portworx/px-operator@sha256:bba082318551a1fe51e690dc723f3c45be9ad50cd53a0bc183b47a5dda9bc4b5
+  - name: px-operator-bba082318551a1fe51e690dc723f3c45be9ad50cd53a0bc183b47a5dda9bc4b5-annotation
+    image: docker.io/portworx/px-operator@sha256:bba082318551a1fe51e690dc723f3c45be9ad50cd53a0bc183b47a5dda9bc4b5
   labels:
     operated-by: portworx-operator
   selector:
@@ -234,7 +235,7 @@ spec:
                     topologyKey: kubernetes.io/hostname
               containers:
               - name: portworx-operator
-                image: docker.io/portworx/px-operator:26.3.1-dev
+                image: docker.io/portworx/px-operator@sha256:bba082318551a1fe51e690dc723f3c45be9ad50cd53a0bc183b47a5dda9bc4b5
                 imagePullPolicy: Always
                 command:
                 - /operator
