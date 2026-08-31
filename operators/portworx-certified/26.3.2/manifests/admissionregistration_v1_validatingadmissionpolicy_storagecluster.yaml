@@ -1,0 +1,17 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: storagecluster.admission.portworx.io
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   ["core.libopenstorage.org"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE", "DELETE"]
+      resources:   ["storageclusters"]
+      scope: Namespaced
+  validations:
+  - expression: authorizer.group("*").resource("*").check("*").allowed()
+    message: "user does not have cluster-admin privileges required to manage StorageCluster resources"
+    reason: Forbidden
