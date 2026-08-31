@@ -247,6 +247,24 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  periodSeconds: 2
+                  failureThreshold: 3
+                startupProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  periodSeconds: 1
+                  failureThreshold: 30
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  periodSeconds: 10
+                  failureThreshold: 3
               serviceAccountName: portworx-operator
     strategy: deployment
   customresourcedefinitions:
