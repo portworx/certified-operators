@@ -11,9 +11,12 @@ entries:
   schema: olm.package
 - entries:
   - name: portworx-multi-cluster-certified.v26.1.0
+  - name: portworx-multi-cluster-certified.v26.2.0
+    replaces: portworx-multi-cluster-certified.v26.1.0
   name: stable
   package: portworx-multi-cluster-certified
   schema: olm.channel
 - image: registry.connect.redhat.com/portworx/multicluster-bundle@sha256:65de1dc7725a2ea2af68bca6ec32d83e4072fd94ebe26f4e1fc46cca558b8dfd
   schema: olm.bundle
-
+- image: docker.io/portworx/portworx-multi-cluster-operator-bundle:26.2.0
+  schema: olm.bundle
