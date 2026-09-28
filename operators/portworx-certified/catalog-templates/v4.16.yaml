@@ -320,6 +320,4 @@ entries:
     schema: olm.bundle
   - image: docker.io/portworx/portworx-certified-bundle:26.4.0
     schema: olm.bundle
-  - image: ""
-    schema: olm.bundle
 schema: olm.template.basic
