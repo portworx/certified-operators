@@ -40,6 +40,30 @@ spec:
           spec:
             description: DisasterRecoveryPairSpec defines the desired state of DisasterRecoveryPair
             properties:
+              advanceConfiguration:
+                description: |-
+                  AdvanceConfiguration lets you manually set connection info instead of
+                  relying on auto-detection. Optional.
+                properties:
+                  destinationEndpoint:
+                    description: DestinationEndpoint sets the destination cluster's
+                      address by hand.
+                    type: string
+                  destinationToken:
+                    description: DestinationToken sets the destination cluster's access
+                      token by hand.
+                    type: string
+                  sourceEndpoint:
+                    description: |-
+                      SourceEndpoint sets the source cluster's address by hand.
+                      Only works when PairType is BI-DIRECTIONAL.
+                    type: string
+                  sourceToken:
+                    description: |-
+                      SourceToken sets the source cluster's access token by hand.
+                      Only works when PairType is BI-DIRECTIONAL.
+                    type: string
+                type: object
               backupLocation:
                 description: |-
                   BackupLocation specifies the object storage configuration for disaster recovery replication;
@@ -355,6 +379,10 @@ spec:
               rule: self.destinationCluster == oldSelf.destinationCluster
             - message: sourceCluster and destinationCluster must be different
               rule: self.sourceCluster != self.destinationCluster
+            - message: advanceConfiguration.sourceEndpoint and sourceToken can only
+                be set when pairType is BI-DIRECTIONAL
+              rule: self.pairType == 'BI-DIRECTIONAL' || !has(self.advanceConfiguration)
+                || (!has(self.advanceConfiguration.sourceEndpoint) && !has(self.advanceConfiguration.sourceToken))
           status:
             description: DisasterRecoveryPairStatus stores the current status of the
               Disaster Recovery Pair

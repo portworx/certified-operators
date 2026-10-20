@@ -65,12 +65,70 @@ spec:
               failbackParameters:
                 description: FailbackParameters contains parameters for failback action
                 properties:
+                  excludeObjects:
+                    description: |-
+                      ExcludeObjects specifies specific objects to exclude from the DR operation.
+                      Mutually exclusive with all other filtering fields (selectors, excludeSelectors, types, includeObjects).
+                    items:
+                      description: ObjectReference identifies a specific Kubernetes
+                        object by its GVK and namespace/name.
+                      properties:
+                        group:
+                          type: string
+                        kind:
+                          minLength: 1
+                          type: string
+                        name:
+                          description: Name of the object
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: Namespace of the object
+                          minLength: 1
+                          type: string
+                        version:
+                          type: string
+                      required:
+                      - kind
+                      - name
+                      - namespace
+                      type: object
+                    type: array
                   excludeSelectors:
                     additionalProperties:
                       type: string
                     description: ExcludeSelectors specifies label selectors that identify
                       resources to be excluded from DR operations.
                     type: object
+                  includeObjects:
+                    description: |-
+                      IncludeObjects specifies specific objects to include in the DR operation.
+                      Mutually exclusive with all other filtering fields (selectors, excludeSelectors, types, excludeObjects).
+                    items:
+                      description: ObjectReference identifies a specific Kubernetes
+                        object by its GVK and namespace/name.
+                      properties:
+                        group:
+                          type: string
+                        kind:
+                          minLength: 1
+                          type: string
+                        name:
+                          description: Name of the object
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: Namespace of the object
+                          minLength: 1
+                          type: string
+                        version:
+                          type: string
+                      required:
+                      - kind
+                      - name
+                      - namespace
+                      type: object
+                    type: array
                   namespaces:
                     description: Namespaces is the list of namespaces to failback
                     items:
@@ -85,6 +143,11 @@ spec:
                       may be set at a time to avoid ambiguous filtering of resources during DR
                       operations.
                     type: object
+                  skipLastMileMigration:
+                    description: |-
+                      SkipLastMileMigration, when true, skips creating and waiting on the
+                      last-mile Migration before activating workloads during failback.
+                    type: boolean
                   types:
                     description: Types restricts the DR operation to the specified
                       Kubernetes resource kinds. If empty, all supported types are
@@ -113,12 +176,70 @@ spec:
               failoverParameters:
                 description: FailoverParameters contains parameters for failover action
                 properties:
+                  excludeObjects:
+                    description: |-
+                      ExcludeObjects specifies specific objects to exclude from the DR operation.
+                      Mutually exclusive with all other filtering fields (selectors, excludeSelectors, types, includeObjects).
+                    items:
+                      description: ObjectReference identifies a specific Kubernetes
+                        object by its GVK and namespace/name.
+                      properties:
+                        group:
+                          type: string
+                        kind:
+                          minLength: 1
+                          type: string
+                        name:
+                          description: Name of the object
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: Namespace of the object
+                          minLength: 1
+                          type: string
+                        version:
+                          type: string
+                      required:
+                      - kind
+                      - name
+                      - namespace
+                      type: object
+                    type: array
                   excludeSelectors:
                     additionalProperties:
                       type: string
                     description: ExcludeSelectors specifies label selectors that identify
                       resources to be excluded from DR operations.
                     type: object
+                  includeObjects:
+                    description: |-
+                      IncludeObjects specifies specific objects to include in the DR operation.
+                      Mutually exclusive with all other filtering fields (selectors, excludeSelectors, types, excludeObjects).
+                    items:
+                      description: ObjectReference identifies a specific Kubernetes
+                        object by its GVK and namespace/name.
+                      properties:
+                        group:
+                          type: string
+                        kind:
+                          minLength: 1
+                          type: string
+                        name:
+                          description: Name of the object
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: Namespace of the object
+                          minLength: 1
+                          type: string
+                        version:
+                          type: string
+                      required:
+                      - kind
+                      - name
+                      - namespace
+                      type: object
+                    type: array
                   namespaces:
                     description: Namespaces is the list of namespaces to failover
                     items:
@@ -133,6 +254,11 @@ spec:
                       may be set at a time to avoid ambiguous filtering of resources during DR
                       operations.
                     type: object
+                  skipLastMileMigration:
+                    description: |-
+                      SkipLastMileMigration, when true, skips creating and waiting on the
+                      last-mile Migration before activating workloads during failover.
+                    type: boolean
                   skipSourceClusterDomainDeactivation:
                     description: SkipSourceClusterDomainDeactivation indicates whether
                       to skip deactivating the source cluster domain during failover.
@@ -199,6 +325,38 @@ spec:
             - message: failbackParameters.namespaces is immutable
               rule: '!has(oldSelf.failbackParameters) || !has(self.failbackParameters)
                 || self.failbackParameters.namespaces == oldSelf.failbackParameters.namespaces'
+            - message: failoverParameters.includeObjects is mutually exclusive with
+                excludeObjects, selectors, excludeSelectors, and types
+              rule: '!has(self.failoverParameters) || !has(self.failoverParameters.includeObjects)
+                || self.failoverParameters.includeObjects.size() == 0 || (!has(self.failoverParameters.excludeObjects)
+                || self.failoverParameters.excludeObjects.size() == 0) && (!has(self.failoverParameters.selectors)
+                || self.failoverParameters.selectors.size() == 0) && (!has(self.failoverParameters.excludeSelectors)
+                || self.failoverParameters.excludeSelectors.size() == 0) && (!has(self.failoverParameters.types)
+                || self.failoverParameters.types.size() == 0)'
+            - message: failoverParameters.excludeObjects is mutually exclusive with
+                includeObjects, selectors, excludeSelectors, and types
+              rule: '!has(self.failoverParameters) || !has(self.failoverParameters.excludeObjects)
+                || self.failoverParameters.excludeObjects.size() == 0 || (!has(self.failoverParameters.includeObjects)
+                || self.failoverParameters.includeObjects.size() == 0) && (!has(self.failoverParameters.selectors)
+                || self.failoverParameters.selectors.size() == 0) && (!has(self.failoverParameters.excludeSelectors)
+                || self.failoverParameters.excludeSelectors.size() == 0) && (!has(self.failoverParameters.types)
+                || self.failoverParameters.types.size() == 0)'
+            - message: failbackParameters.includeObjects is mutually exclusive with
+                excludeObjects, selectors, excludeSelectors, and types
+              rule: '!has(self.failbackParameters) || !has(self.failbackParameters.includeObjects)
+                || self.failbackParameters.includeObjects.size() == 0 || (!has(self.failbackParameters.excludeObjects)
+                || self.failbackParameters.excludeObjects.size() == 0) && (!has(self.failbackParameters.selectors)
+                || self.failbackParameters.selectors.size() == 0) && (!has(self.failbackParameters.excludeSelectors)
+                || self.failbackParameters.excludeSelectors.size() == 0) && (!has(self.failbackParameters.types)
+                || self.failbackParameters.types.size() == 0)'
+            - message: failbackParameters.excludeObjects is mutually exclusive with
+                includeObjects, selectors, excludeSelectors, and types
+              rule: '!has(self.failbackParameters) || !has(self.failbackParameters.excludeObjects)
+                || self.failbackParameters.excludeObjects.size() == 0 || (!has(self.failbackParameters.includeObjects)
+                || self.failbackParameters.includeObjects.size() == 0) && (!has(self.failbackParameters.selectors)
+                || self.failbackParameters.selectors.size() == 0) && (!has(self.failbackParameters.excludeSelectors)
+                || self.failbackParameters.excludeSelectors.size() == 0) && (!has(self.failbackParameters.types)
+                || self.failbackParameters.types.size() == 0)'
           status:
             description: DisasterRecoveryActionStatus defines the observed state of
               DisasterRecoveryAction

@@ -1,3 +1,4 @@
+---
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -77,12 +78,33 @@ metadata:
               ]
             }
           }
+        },
+        {
+          "apiVersion": "multicluster.portworx.com/v1alpha1",
+          "kind": "ReverseProtectionGroup",
+          "metadata": {
+            "name": "protectiongroup-sample",
+            "namespace": "portworx"
+          },
+          "spec": {
+            "namespaceSelection": {
+              "namespaces": ["app-namespace"]
+            },
+            "replicationSchedulePolicy": {
+              "interval": {
+                "intervalMinutes": 60
+              }
+            },
+            "resourceConfiguration": {
+              "includeAllResources": true
+            }
+          }
         }
       ]
     capabilities: Deep Insights
     categories: "Storage"
-    containerImage: registry.connect.redhat.com/portworx/multicluster@sha256:bb092702fb1243e255492f6a85bef9273650d415f136c501c30550b5906fe0b9
-    createdAt: "2026-07-10T00:00:00Z"
+    containerImage: docker.io/portworx/base-px-multi-cluster-operator:26.2.0-dev
+    createdAt: "2026-08-13T00:00:00Z"
     description: Multi-cluster disaster recovery and management for Portworx Enterprise
     support: Portworx, Inc
     certified: "true"
@@ -565,47 +587,47 @@ spec:
       name: reverseprotectiongroups.multicluster.portworx.com
       version: v1alpha1
       specDescriptors:
-      - description: List of namespaces to protect in reverse direction
+      - description: Namespaces is the explicit list of namespaces that are part of this reverse protection group
         displayName: Namespaces
         path: namespaceSelection.namespaces
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
-      - description: Namespace selectors by labels for reverse direction
+      - description: Namespace selectors by labels for the reverse direction
         displayName: Namespace Selectors
         path: namespaceSelection.namespaceSelectors
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
-      - description: Suspend replication schedule for reverse direction
+      - description: Suspend replication schedule for the reverse direction
         displayName: Suspend
         path: replicationSchedulePolicy.suspend
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Interval-based replication schedule in minutes for reverse direction
+      - description: Interval-based replication schedule in minutes for the reverse direction
         displayName: Interval Minutes
         path: replicationSchedulePolicy.interval.intervalMinutes
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
-      - description: Interval policy retain count for reverse direction
+      - description: Interval policy retain count for the reverse direction
         displayName: Interval Retain
         path: replicationSchedulePolicy.interval.retain
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
-      - description: Include all resources in selected namespaces for reverse direction
+      - description: Include all resources in selected namespaces for the reverse direction
         displayName: Include All Resources
         path: resourceConfiguration.includeAllResources
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Include application volumes (PVCs) in reverse replication
+      - description: Include application volumes (PVCs) in replication for the reverse direction
         displayName: Include Application Volumes
         path: resourceConfiguration.customSelection.includeApplicationVolumes
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Start applications after failover in reverse direction
+      - description: Start applications after failover for the reverse direction
         displayName: Start Applications After Failover
         path: resourceConfiguration.customSelection.startApplicationsAfterFailover
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Include CIDR-based network policies in reverse direction
+      - description: Include CIDR-based network policies for the reverse direction
         displayName: Include CIDR Network Policies
         path: resourceConfiguration.customSelection.includeCIDRBasedNetworkPolicies
         x-descriptors:
@@ -630,22 +652,22 @@ spec:
         path: resourceConfiguration.customSelection.resourceTypeSelector.exclude
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
-      - description: Purge deleted resources from destination cluster in reverse direction
+      - description: Purge deleted resources from destination cluster for the reverse direction
         displayName: Purge Deleted Resources At Source
         path: advanceConfiguration.purgeDeletedResourcesAtSource
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Skip deleted namespaces during reverse migration
+      - description: Skip deleted namespaces during migration for the reverse direction
         displayName: Ignore Deleted Namespaces At Source
         path: advanceConfiguration.ignoreDeletedNamespacesAtSource
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Skip service updates during reverse migration
+      - description: Skip service updates during migration for the reverse direction
         displayName: Skip Service Update
         path: advanceConfiguration.skipServiceUpdate
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Ignore owner references validation during reverse migration
+      - description: Ignore owner references validation during migration for the reverse direction
         displayName: Ignore Owner References Validation
         path: advanceConfiguration.ignoreOwnerReferencesValidation
         x-descriptors:
@@ -666,7 +688,7 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
       statusDescriptors:
-      - description: Current phase of the reverse protection group
+      - description: Phase represents the current phase of the reverse protection group
         displayName: Phase
         path: phase
         x-descriptors:
@@ -899,31 +921,32 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
   description: |
-    ## Portworx MultiCluster Operator
+    ## Portworx Multi-Cluster Operator
 
-    The Portworx MultiCluster Operator provides enterprise-grade disaster recovery and multi-cluster management capabilities for Portworx Enterprise storage clusters.
+    The Portworx Multi-Cluster Operator provides enterprise-grade disaster recovery and multi-cluster management capabilities for Portworx Enterprise storage clusters.
 
     ### Features
-    - **Red Hat ACM Integration**: Native integration with Red Hat Advanced Cluster Management (RHACM) to provide a unified DR and multi-cluster management experience for Portworx-enabled OpenShift clusters.
-    - **Multi-cluster disaster recovery orchestration**: Orchestrate DR across workload clusters from a single RHACM hub cluster, including cluster pairing, protection group creation and management, and workload failover/failback.
-    - **ACM console based DR workflows**: Use the Portworx ACM Dynamic Console Plugin UI to manage DR through guided workflows.
-    - **Centralized fleet view**: Monitor cluster health and DR health across the Portworx cluster fleet from a single interface.
-    - **Declarative DR management**: Define and manage DR workflows declaratively through Kubernetes custom resources for a more consistent, repeatable multi-cluster operating model.
-
+    - **Multi-Cluster Management**: Centrally manage multiple Portworx clusters from a single OpenShift hub
+    - **Disaster Recovery**: Automated disaster recovery policies, protection groups, and failover orchestration
+    - **Cluster Monitoring**: Real-time monitoring of cluster health, status, and replication metrics
+    - **Integration with Red Hat Advanced Cluster Management (RHACM)**: Seamless integration with RHACM for multi-cluster operations
+    - **Policy-Based Protection**: Define and enforce disaster recovery policies across clusters
+    - **Application-Aware DR**: Protect entire applications including data, configuration, and dependencies
 
     ### Prerequisites
-    - OpenShift Container Platform 4.18 or later.
-    - Portworx Enterprise 3.5 or later installed on managed clusters.
-    - Red Hat Advanced Cluster Management (RHACM) 2.14 or later (recommended).
+    - OpenShift Container Platform 4.16 or later
+    - Portworx Enterprise 3.6 or later installed on managed clusters
+    - Red Hat Advanced Cluster Management (RHACM) 2.14 or later (recommended)
 
     ### Getting Started
-    1. Install the Portworx MultiCluster Operator from OperatorHub on the ACM hub cluster.
-    2. Import OpenShift clusters running Portworx Enterprise into ACM.
-    3. Create Disaster Recovery Pairs to establish a trusted replication channel between clusters.
-    4. Define ProtectionGroups to protect applications and namespaces.
-    5. Manage and monitor disaster recovery operations through the UI or Custom Resources.
+    1. Install the operator from OperatorHub
+    2. Define ProtectionGroup and DisasterRecoveryAction resources for DR operations
+    3. Monitor disaster recovery status through the OpenShift console
+
+    For more information, visit the [documentation](https://docs.portworx.com/portworx-enterprise).
   displayName: Portworx Multi-Cluster Operator
   version: 26.2.0
+  replaces: portworx-multi-cluster-certified.v26.1.0
   minKubeVersion: "1.24.0"
   maturity: stable
   maintainers:
@@ -1156,6 +1179,7 @@ spec:
           verbs:
           - get
           - list
+          - update
           - watch
         - apiGroups:
           - policy.open-cluster-management.io
@@ -1234,6 +1258,25 @@ spec:
           - get
           - patch
           - update
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterroles
+          verbs:
+          - get
+          - list
         serviceAccountName: px-multi-cluster-operator
       permissions:
       - rules:
@@ -1315,6 +1358,21 @@ spec:
           - update
           - patch
           - delete
+        # DR alerting: manage ServiceMonitor and PrometheusRule in the operator namespace.
+        # ALERTING_ENABLED is read at runtime from the px-multi-cluster-operator-config ConfigMap (not an env var).
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          - prometheusrules
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
         serviceAccountName: px-multi-cluster-operator
       deployments:
       - name: px-multi-cluster-operator
@@ -1356,7 +1414,7 @@ spec:
                 - --unsafe-disable-tls=false
                 - --tls-key=/etc/tls/tls.key
                 - --tls-cert=/etc/tls/tls.crt
-                image: registry.connect.redhat.com/portworx/multicluster@sha256:bb092702fb1243e255492f6a85bef9273650d415f136c501c30550b5906fe0b9
+                image: docker.io/portworx/base-px-multi-cluster-operator:26.2.0-dev
                 imagePullPolicy: Always
                 name: manager
                 securityContext:
@@ -1446,7 +1504,7 @@ spec:
                   type: RuntimeDefault
               containers:
               - name: console-plugin
-                image: registry.connect.redhat.com/portworx/multicluster-plugin@sha256:82145f7dfe0c5310247e345eee0ab0cb1a315cb709dd9157477571bfb4a7e884
+                image: docker.io/portworx/base-px-multi-cluster-plugin:26.2.0-dev
                 imagePullPolicy: Always
                 ports:
                 - name: https
