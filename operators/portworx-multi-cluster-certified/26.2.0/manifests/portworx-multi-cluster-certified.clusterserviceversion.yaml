@@ -1,4 +1,3 @@
----
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -103,7 +102,7 @@ metadata:
       ]
     capabilities: Deep Insights
     categories: "Storage"
-    containerImage: docker.io/portworx/base-px-multi-cluster-operator:26.2.0-dev
+    containerImage: docker.io/portworx/base-px-multi-cluster-operator@sha256:c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3
     createdAt: "2026-08-13T00:00:00Z"
     description: Multi-cluster disaster recovery and management for Portworx Enterprise
     support: Portworx, Inc
@@ -581,7 +580,8 @@ spec:
         path: compliant.reason
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
-    - description: ReverseProtectionGroup is the Schema for the reverseprotectiongroups API. It represents the reverse direction configuration for a ProtectionGroup, allowing users to override settings for the reverse DR direction (secondary to primary).
+    - description: ReverseProtectionGroup is the Schema for the reverseprotectiongroups API. It represents the reverse direction configuration for a ProtectionGroup, allowing users to override settings
+        for the reverse DR direction (secondary to primary).
       displayName: Reverse Protection Group
       kind: ReverseProtectionGroup
       name: reverseprotectiongroups.multicluster.portworx.com
@@ -971,9 +971,15 @@ spec:
     url: https://docs.portworx.com/portworx-enterprise/support/contact-support
   relatedImages:
   - name: px-multi-cluster-operator
-    image: docker.io/portworx/base-px-multi-cluster-operator:26.2.0-dev
+    image: docker.io/portworx/base-px-multi-cluster-operator@sha256:c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3
   - name: px-multi-cluster-plugin
-    image: docker.io/portworx/base-px-multi-cluster-plugin:26.2.0-dev
+    image: docker.io/portworx/base-px-multi-cluster-plugin@sha256:f0b3635fb302d00ebab3871c5d047c006aa2b08ae975e4a251ffe80f6a31d90b
+  - name: base-px-multi-cluster-operator-c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3-annotation
+    image: docker.io/portworx/base-px-multi-cluster-operator@sha256:c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3
+  - name: manager
+    image: docker.io/portworx/base-px-multi-cluster-operator@sha256:c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3
+  - name: console-plugin
+    image: docker.io/portworx/base-px-multi-cluster-plugin@sha256:f0b3635fb302d00ebab3871c5d047c006aa2b08ae975e4a251ffe80f6a31d90b
   labels:
     operated-by: px-multi-cluster-operator
   selector:
@@ -1414,7 +1420,7 @@ spec:
                 - --unsafe-disable-tls=false
                 - --tls-key=/etc/tls/tls.key
                 - --tls-cert=/etc/tls/tls.crt
-                image: docker.io/portworx/base-px-multi-cluster-operator:26.2.0-dev
+                image: docker.io/portworx/base-px-multi-cluster-operator@sha256:c4a16300df900a7e92fb8926bc31316a70f562f82762a87a989af2cc4fb0cba3
                 imagePullPolicy: Always
                 name: manager
                 securityContext:
@@ -1504,7 +1510,7 @@ spec:
                   type: RuntimeDefault
               containers:
               - name: console-plugin
-                image: docker.io/portworx/base-px-multi-cluster-plugin:26.2.0-dev
+                image: docker.io/portworx/base-px-multi-cluster-plugin@sha256:f0b3635fb302d00ebab3871c5d047c006aa2b08ae975e4a251ffe80f6a31d90b
                 imagePullPolicy: Always
                 ports:
                 - name: https
