@@ -112,6 +112,8 @@ entries:
         replaces: portworx-operator.v26.3.2
       - name: portworx-operator.v26.5.0
         replaces: portworx-operator.v26.4.0
+      - name: portworx-operator.v26.6.0
+        replaces: portworx-operator.v26.3.2
     name: alpha
     package: portworx-certified
     schema: olm.channel
@@ -221,6 +223,8 @@ entries:
         replaces: portworx-operator.v26.3.2
       - name: portworx-operator.v26.5.0
         replaces: portworx-operator.v26.4.0
+      - name: portworx-operator.v26.6.0
+        replaces: portworx-operator.v26.3.2
     name: stable
     package: portworx-certified
     schema: olm.channel
@@ -325,5 +329,7 @@ entries:
   - image: registry.connect.redhat.com/portworx/portworx-certified-bundle@sha256:b669e2e63ec1f90926eddbe0d146d7a168ceb9fef41f5bc5fe87d1543a7889cc
     schema: olm.bundle
   - image: registry.connect.redhat.com/portworx/portworx-certified-bundle@sha256:3eb3ac583150042ebcd5a2a3de2ccb97db160372ebe7ee8496493a0fc6e99692
+    schema: olm.bundle
+  - image: docker.io/portworx/portworx-certified-bundle:26.6.0
     schema: olm.bundle
 schema: olm.template.basic
