@@ -111,7 +111,7 @@ entries:
       - name: portworx-operator.v26.4.0
         replaces: portworx-operator.v26.3.2
       - name: portworx-operator.v26.5.1
-        replaces: portworx-operator.v26.3.2
+        replaces: portworx-operator.v26.4.0
     name: alpha
     package: portworx-certified
     schema: olm.channel
@@ -220,7 +220,7 @@ entries:
       - name: portworx-operator.v26.4.0
         replaces: portworx-operator.v26.3.2
       - name: portworx-operator.v26.5.1
-        replaces: portworx-operator.v26.3.2
+        replaces: portworx-operator.v26.4.0
     name: stable
     package: portworx-certified
     schema: olm.channel
