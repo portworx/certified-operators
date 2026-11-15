@@ -79,6 +79,8 @@ spec:
   relatedImages:
     - name: portworx-operator
       image: docker.io/portworx/px-operator:27.1.0-dev
+    - name: px-plugin
+      image: docker.io/portworx/portworx-dynamic-plugin@sha256:f7f78159109ea390ecb45888a1dfe194ae961b97b026d0548e17be7754b1fd34
   labels:
     operated-by: portworx-operator
   selector:
@@ -248,6 +250,103 @@ spec:
                     fieldRef:
                       fieldPath: metadata.name
               serviceAccountName: portworx-operator
+      - name: px-plugin
+        label:
+          app: px-plugin
+          app.kubernetes.io/name: px-plugin
+          app.kubernetes.io/instance: px-plugin
+          app.kubernetes.io/part-of: px-plugin
+        spec:
+          replicas: 2
+          selector:
+            matchLabels:
+              app: px-plugin
+              app.kubernetes.io/name: px-plugin
+              app.kubernetes.io/instance: px-plugin
+              app.kubernetes.io/part-of: px-plugin
+          strategy:
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 1
+            type: RollingUpdate
+          template:
+            metadata:
+              labels:
+                app: px-plugin
+                app.kubernetes.io/name: px-plugin
+                app.kubernetes.io/instance: px-plugin
+                app.kubernetes.io/part-of: px-plugin
+              annotations:
+                openshift.io/required-scc: restricted-v2
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                podAntiAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                          - px-plugin
+                      topologyKey: kubernetes.io/hostname
+              automountServiceAccountToken: false
+              containers:
+              - name: px-plugin
+                image: docker.io/portworx/portworx-dynamic-plugin@sha256:f7f78159109ea390ecb45888a1dfe194ae961b97b026d0548e17be7754b1fd34
+                imagePullPolicy: IfNotPresent
+                ports:
+                - containerPort: 9443
+                  protocol: TCP
+                readinessProbe:
+                  httpGet:
+                    path: /plugin-manifest.json
+                    port: 9443
+                    scheme: HTTPS
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                resources:
+                  requests:
+                    cpu: 10m
+                    memory: 50Mi
+                volumeMounts:
+                - name: px-plugin-cert
+                  readOnly: true
+                  mountPath: /var/cert
+                - name: nginx-conf
+                  readOnly: true
+                  mountPath: /etc/nginx/nginx.conf
+                  subPath: nginx.conf
+              volumes:
+              - name: px-plugin-cert
+                secret:
+                  secretName: px-plugin-cert
+                  defaultMode: 420
+              - name: nginx-conf
+                configMap:
+                  name: px-plugin
+                  defaultMode: 420
+              restartPolicy: Always
+              dnsPolicy: ClusterFirst
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
     strategy: deployment
   customresourcedefinitions:
     owned:
